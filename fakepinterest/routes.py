@@ -23,19 +23,17 @@ def homepage():
         if usuario:
             bcrypt.check_password_hash(usuario.senha, form_login.senha.data)
             login_user(usuario)
-            return redirect(url_for("perfil", id_usuario=usuario.id))    
+            return redirect(url_for('perfil', id_usuario=usuario.id))    
 
-    return render_template("homepage.html", form=form_login)
+    return render_template('homepage.html', form=form_login)
 
 
 @app.route("/criar_conta", methods=["GET", "POST"])
 def criarconta():
     
-    print("Rota /criar conta acessada.", flush=True)
     form_criar_conta = FormCriarConta()
     
     if form_criar_conta.validate_on_submit():
-        print("Formulário validado com sucesso", flush=True)
         senha = bcrypt.generate_password_hash(form_criar_conta.senha.data)  ## BIBLIOTECA PARA CRIPTOGRAFIA DE SENHAS NO BANCO DE DADOS
         usuario = Usuario(  
                             username=form_criar_conta.username.data 
@@ -47,19 +45,19 @@ def criarconta():
         try:
             database.session.add(usuario)
             database.session.commit()
-            print("Usuário salvo no banco de dados", flush=True)
+            logging.debug("Usuário salvo no banco de dados")
+
+            login_user(usuario, remember=True)
+            return redirect(url_for("perfil", id_usuario=usuario.id))
         except Exception as e:
             database.session.rollback()
-            print(f"Erro ao salvar no banco de dados: {e}", flush=True)
-
-        login_user(usuario, remember=True)
-        return redirect(url_for("perfil", id_usuario=usuario.id))
+            logging.debug(f"Erro ao salvar no banco de dados: {e}")
     else:
-        print("Formulário não validado", flush=True)
-        print("Erros:", form_criar_conta.errors, flush=True)
+        logging.debug("Formulário não validado.")
+        logging.debug(f"Erros: {form_criar_conta.errors}")
 
     
-    return render_template("criar_conta.html", form=form_criar_conta)
+    return render_template('criar_conta.html', form=form_criar_conta)
 
 
 @app.route("/perfil/<id_usuario>", methods=["GET", "POST"])
@@ -86,11 +84,11 @@ def perfil(id_usuario):
             database.session.add(foto)
             database.session.commit()
 
-        return render_template("perfil.html",usuario=current_user, form=form_foto)
+        return render_template('perfil.html',usuario=current_user, form=form_foto)
     
     else:                                       ## USUÁRIO ESTÁ VERIFICANDO O PERFIL DE OUTRO USUÁRIO
         usuario = Usuario.query.get(int(id_usuario))
-        return render_template("perfil.html",usuario=usuario, form=None)
+        return render_template('perfil.html',usuario=usuario, form=None)
 
 @app.route('/logout')
 @login_required

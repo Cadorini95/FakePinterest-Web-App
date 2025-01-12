@@ -73,11 +73,29 @@
 
           <div class="div-input">
             {{ form.email.label(class="label") }}
+
+            <!--ESTRUTURA PARA CONFIRMAÇÃO DE ERRO DENTRO DO HTML-->
+            {% if form.email.errors %}
+              {% for erro in form.email.errors %}
+                <p style="color:red"> {{ erro }}  </p>
+              {% endfor %}
+            {% endif %}
+            <!--FINALIZAÇÃO DA ESTRUTURA DE ERRO-->
+
             {{ form.email(class="input") }}
           </div>
 
           <div class="div-input">
             {{ form.senha.label(class="label") }}
+
+            <!--ESTRUTURA PARA CONFIRMAÇÃO DE ERRO DENTRO DO HTML-->
+            {% if form.senha.errors %}
+              {% for erro in form.senha.errors %}
+                <p style="color:red"> {{ erro }}  </p>
+              {% endfor %}
+            {% endif %}
+            <!--FINALIZAÇÃO DA ESTRUTURA DE ERRO-->
+
             {{ form.senha(class="input") }} 
           </div>
 
